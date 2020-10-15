@@ -1,0 +1,196 @@
+openapi: 3.0.1
+info:
+  title: Transaction system
+  description: International business man test
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+tags:
+- name: transaction
+  description: Transactions operations
+- name: rates
+  description: rates operations
+paths:
+  /transactions:
+    get:
+      tags:
+      - transaction
+      summary: Returns a list of transactions
+      operationId: GetTransactions
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transactions'
+        "400":
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "404":
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "405":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      x-swagger-router-controller: Transaction
+  /transactions/{sku}:
+    get:
+      tags:
+      - transaction
+      summary: Returns a transaction collection by sku
+      operationId: GetSkuTransaction
+      parameters:
+      - name: sku
+        in: path
+        description: the sku value to filter by
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transactions'
+        "400":
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "404":
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "405":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      x-swagger-router-controller: Transaction
+  /rates:
+    get:
+      tags:
+      - rates
+      summary: Returns a rates collection
+      operationId: GetRates
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rates'
+        "400":
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "404":
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        "405":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      x-swagger-router-controller: Rates
+components:
+  schemas:
+    Transactions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Transaction'
+    Transaction:
+      type: object
+      properties:
+        sku:
+          type: string
+          description: sku value, transaction id
+          format: string
+          example: W4442
+        amount:
+          type: string
+          description: amount value for the transaction
+          format: number
+          example: "24.8"
+        currency:
+          type: string
+          description: currency code
+          format: string
+          example: CAD
+      example:
+        amount: "24.8"
+        currency: CAD
+        sku: W4442
+    Rates:
+      type: array
+      items:
+        $ref: '#/components/schemas/Rate'
+    Rate:
+      type: object
+      properties:
+        from:
+          type: string
+          description: from currency
+          format: string
+          example: USD
+        to:
+          type: string
+          description: currency to convert
+          format: string
+          example: EUR
+        rate:
+          type: string
+          description: the currency exachange rate value
+          format: number
+          example: "1.1"
+      example:
+        rate: "1.1"
+        from: USD
+        to: EUR
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://login.microsoftonline.com
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
